@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Numbers Game - By ፚ Ꭷ Ꮢ Ꭷ ❥</title>
+
+   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+   <style>
+      body {
+         margin: 0;
+         padding: 0;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+         height: 99vh;
+         width: 100%;
+         font-family: sans-serif;
+         font-weight: bold;
+         background: #000000; 
+         color: #f8e71c; 
+      }
+
+      .game {
+         display: grid;
+         grid-template-columns: repeat(4, 1fr);
+         grid-row-gap: 10px;
+         grid-column-gap: 10px;
+         width: 90vh;
+         height: 90vh;
+         font-size: 40px;
+         margin-bottom: 20px;
+      }
+
+      .card {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         background: linear-gradient(45deg, #e74c3c, #c0392b); 
+         color: #ffffff; 
+         cursor: pointer;
+         transition-duration: 0.5s;
+         transition-property: transform;
+         border-radius: 15px;
+         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+      }
+
+      .hidden:hover {
+         opacity: 1;
+         transform: scale(1.05);
+      }
+
+      .hidden:active,
+      .hidden:focus {
+         opacity: 1;
+         transform: scale(1.05);
+      }
+
+      .hidden>div {
+         transition: 500ms;
+         transition-property: opacity, transform;
+         opacity: 0;
+      }
+
+      #newgame {
+         display: none;
+         font-size: 20px;
+         background: #c0392b;
+         color: #ffffff;
+         padding: 1em;
+         cursor: pointer;
+         border-radius: 10px;
+         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+      }
+
+      #timer {
+         font-size: 20px;
+         padding: 1em;
+         color: #e74c3c; 
+      }
+
+      @media screen and (orientation: portrait) {
+         .game {
+            width: 90vw;
+            height: 90vw;
+         }
+
+         #newgame {
+            font-size: 20px;
+         }
+      }
+
+      #developer-info {
+         margin-top: 20px;
+         font-size: 16px;
+         color: #ffffff;
+      }
+
+      #developer-info a {
+         color: #e74c3c;
+         text-decoration: none;
+      }
+
+      #developer-info a:hover {
+         text-decoration: underline;
+      }
+   </style>
+</head>
+
+<body>
+   <div class="game"></div>
+
+   <div id="timer">00</div>
+   <div id="newgame">Play again</div>
+
+   <div id="developer-info">
+      Developed by <a href="https://t.me/ZORO2045" target="_blank">ፚ Ꭷ Ꮢ Ꭷ ❥</a>
+   </div>
+</body>
+
+<script type="text/javascript">
+   let tg = window.Telegram.WebApp;
+
+   tg.expand();
+
+   document.body.style.background = tg.themeParams.bg_color ? tg.themeParams.bg_color : "#000000";
+   document.querySelector('#newgame').style.background = tg.themeParams.button_color ? tg.themeParams.button_color : "#c0392b";
+   document.querySelector('#newgame').style.color = tg.themeParams.button_text_color ? tg.themeParams.button_text_color : "#ffffff";
+
+   let first_card = '';
+   card_number = 16;
+   let game = document.querySelector('.game');
+   let newgame = document.getElementById('newgame');
+   let timer = document.getElementById("timer");
+   timer.style.color = tg.themeParams.button_color ? tg.themeParams.button_color : "#e74c3c";
+
+   function randomInteger(min, max) {
+      let rand = min - 0.5 + Math.random() * (max - min + 1);
+      return Math.round(rand);
+   }
+
+   function create_game() {
+      let card_arr = [];
+      let new_numbs = [];
+
+      game.style.pointerEvents = "auto";
+      newgame.style.display = "none";
+      timer.style.display = "block";
+
+      for (let i = 0; i < card_number; i++) {
+         let div = document.createElement('div');
+         div.classList.add('card');
+         div.classList.add('hidden');
+         div.id = `card${i + 1}`;
+
+         div.style.background = tg.themeParams.button_color ? tg.themeParams.button_color : "linear-gradient(45deg, #e74c3c, #c0392b)"; 
+         div.style.color = tg.themeParams.button_text_color ? tg.themeParams.button_text_color : "#ffffff"; 
+
+         while (true) {
+            newone = randomInteger(1, card_number / 2);
+            if (new_numbs.indexOf(newone) == -1) {
+               new_numbs.push(newone);
+               break;
+            } else if (new_numbs.indexOf(newone) == new_numbs.lastIndexOf(newone)) {
+               new_numbs.push(newone);
+               break;
+            }
+         }
+
+         let in_div = document.createElement('div');
+         in_div.innerText = newone;
+
+         div.append(in_div)
+
+         div.addEventListener('click', function () {
+
+            if (!this.classList.contains('hidden'))
+               return false;
+
+            game.style.pointerEvents = "none";
+            if (first_card == '') {
+               first_card = this.id;
+               this.classList.remove('hidden');
+               game.style.pointerEvents = "auto";
+            } else {
+               this.classList.remove('hidden');
+               if (this.textContent == document.getElementById(first_card).textContent) {
+                  first_card = '';
+                  game.style.pointerEvents = "auto";
+               } else {
+                  setTimeout(() => {
+                     document.getElementById(first_card).classList.add('hidden');
+                     this.classList.add('hidden');
+                     first_card = '';
+                     game.style.pointerEvents = "auto";
+                  }, 150);
+               }
+
+               let hidden_cards = document.getElementsByClassName("hidden");
+
+               if (hidden_cards.length == 0) {
+                  newgame.innerText = 'You won 🎉, play again!';
+                  game.style.pointerEvents = "none";
+                  newgame.style.opacity = 1;
+                  newgame.style.display = 'block';
+
+                  clearInt();
+                  newgame.addEventListener('click', remove_newgame);
+               }
+            }
+         });
+
+         game.append(div);
+      }
+
+      function remove_newgame() {
+         newgame.removeEventListener('click', remove_newgame);
+         game.innerHTML = '';
+         create_game();
+      }
+
+      timer.innerText = 30;
+
+      let timerI = setInterval(() => {
+         if (+timer.innerText > 0) {
+            timer.innerText = timer.innerText - 1;
+         } else {
+            newgame.innerText = 'You lost, try again!';
+            game.style.pointerEvents = "none";
+            newgame.style.display = "block";
+            newgame.addEventListener('click', remove_newgame);
+            clearInt();
+         }
+      }, 1000);
+
+      function clearInt() {
+         clearInterval(timerI);
+         timer.style.display = "none";
+      }
+   }
+
+   create_game();
+</script>
+
+</html>
